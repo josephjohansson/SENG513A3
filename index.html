@@ -1,0 +1,109 @@
+<!--created by jose rodriguez 10121643-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat app</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font: 13px Helvetica, Arial; }
+        p { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+        form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+        form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+        form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+        #messages { list-style-type: none; margin: 0; padding: 0; }
+        #messages li { padding: 5px 10px; }
+        #messages li:nth-child(odd) { background: #eee; }
+        #onlineusers { list-style-type: none; margin: 0; padding: 0; }
+        #onlineusers li { padding: 5px 10px; }
+        #onlineusers li:nth-child(odd) { background: #eee; }
+    </style>
+</head>
+<body>
+    <p id = "uid"></p>
+    <p>Online Users:</p>
+    <ul id="onlineusers"></ul>
+    <p></p>
+    <p>Chat:</p>
+    <ul id="messages"></ul>
+
+    <form action="">
+        <input id="m" autocomplete="off" /><button>Send</button>
+    </form>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+        $(function () {
+
+            //Print username in the begening
+            var socket = io();
+            socket.on('username', function(uname, color, update){
+
+                if(document.cookie.length == 0){
+                    $('#uid').css("color",color).text('You are '+uname);
+                    document.cookie = `username=${uname}`;
+                    document.cookie = `color=${color}`;
+                }
+                else {
+                    a = document.cookie.split(';');
+                    var col = a[1].trim().split('=')[1]
+                    var name = a[0].trim().split('=')[1]
+                    if(update == true){
+                        console.log("help")
+                        $('#uid').css("color",color).text('You are '+uname);
+                        document.cookie = `username=${uname}`;
+                        document.cookie = `color=${color}`;
+
+                    }
+                    else{
+                        console.log("wert")
+                        $('#uid').css("color",color).text('You are '+name);
+                        socket.emit('update users', name,color)
+                    }
+
+                }
+
+            });
+
+
+            //take input when the send button is pressed
+            $('form').submit(function(){
+                if($('#m').val().includes("/nickcolor")){
+                    socket.emit('change nickcol','#'+$('#m').val().split('/nickcolor')[1].trim());
+                }
+                else if ($('#m').val().includes("/nick")){
+                    socket.emit('change nick',$('#m').val().split('/nick')[1].trim());
+                }
+                else {
+                    socket.emit('send chat message', $('#m').val(),$('#uid').text().split('You are ')[1], $('#uid').css("color"));
+                }
+                $('#m').val('');
+                return false;
+
+
+            });
+            //Show online users
+            socket.on('online users', function(userobject){
+                $('#onlineusers').empty()
+                for (var i = 0; i < userobject.length; i++) {
+                    $('#onlineusers').append($('<li>').css("color",userobject[i].color).text(userobject[i].name))
+                }
+                return false;
+            });
+            socket.on('chat message', function(sockid, time,user,clr, msg){
+                //If yourself emit the text in bold and for others emit it in regular.
+                if(socket.id == sockid){
+
+                    $('#messages').append(`<li style="font-weight: Bold">${time} <span style='color: ${clr}'>${user}: </span>${msg}</li>`);
+                }
+                else{
+                    $('#messages').append(`<li>${time} <span style='color: ${clr}'>${user}: </span>${msg}</li>`);
+                }
+            });
+
+
+        });
+    </script>
+</body>
+</html>
