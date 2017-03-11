@@ -12,9 +12,14 @@
         form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
         form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
         form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-        #messages { list-style-type: none; margin: 0; padding: 0; }
-        #messages li { padding: 5px 10px; }
-        #messages li:nth-child(odd) { background: #eee; }
+
+        #messages { margin:0;
+            padding:0;
+            list-style:none;
+            position: absolute;
+            bottom: 20px;}
+        #messages li { padding: 5px 10px; vertical-align: bottom}
+        #messages li:nth-child(odd) { background: #eee; vertical-align: bottom}
         #onlineusers { list-style-type: none; margin: 0; padding: 0; }
         #onlineusers li { padding: 5px 10px; }
         #onlineusers li:nth-child(odd) { background: #eee; }
@@ -49,6 +54,7 @@
                     a = document.cookie.split(';');
                     var col = a[1].trim().split('=')[1]
                     var name = a[0].trim().split('=')[1]
+                    console.log("asdfasdf")
                     if(update == true){
                         console.log("help")
                         $('#uid').css("color",color).text('You are '+uname);
@@ -58,8 +64,8 @@
                     }
                     else{
                         console.log("wert")
-                        $('#uid').css("color",color).text('You are '+name);
-                        socket.emit('update users', name,color)
+                        $('#uid').css("color",col).text('You are '+name);
+                        socket.emit('update users', name,col)
                     }
 
                 }

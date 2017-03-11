@@ -88,7 +88,7 @@ io.on('connection', function(socket){
     //push this user to the list
 
     var cookie = socket.handshake.headers.cookie;
-    console.log(cookie);
+
     if (typeof cookie != 'undefined'){
 
     }
@@ -126,11 +126,9 @@ io.on('connection', function(socket){
             }
         }
         //show remain users
-        io.emit('online users', users )
+        io.emit('online users', users );
 
-        if (users.length == 0){
-            console.log(users.length)
-        }
+
         for (var i = 0; i < users.length; i++) {
             console.log(users[i]);
 
@@ -138,6 +136,7 @@ io.on('connection', function(socket){
     });
     socket.on('update users', function (name, color) {
         users.push({id: socketId, name: name, color: color});
+        console.log(color)
         io.emit('online users', users);
 
     });
